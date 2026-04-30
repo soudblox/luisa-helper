@@ -13,7 +13,6 @@
 (function () {
     'use strict';
 
-    // styling popup etc
     GM_addStyle(`
         .luisa-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -101,7 +100,6 @@
         13: "Produk"
     };
 
-    // Subjects excluded from average calculations (loose match — contains check)
     const EXCLUDED_SUBJECTS = ['bimbingan konseling'];
     const isExcludedSubject = (name) => EXCLUDED_SUBJECTS.some(ex => name.toLowerCase().includes(ex));
 
@@ -208,7 +206,6 @@
         return span;
     };
 
-    // ── Unified Modal System ──
     const Modal = (() => {
         const instances = new Map();
 
@@ -245,8 +242,6 @@
         const show = (id, html) => {
             const modal = instances.get(id) || _build(id);
             modal.content.innerHTML = html;
-            // Force a layout frame so the initial state (opacity 0, scale 0.7) renders
-            // before transitioning to visible — otherwise the browser skips the animation
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     modal.overlay.classList.add('visible');
@@ -282,7 +277,6 @@
             `);
         };
 
-        // Single global Escape handler
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') hideAll();
         });
@@ -629,7 +623,6 @@
             });
         });
 
-        // Sort by most recently updated, then by created
         flat.sort((a, b) => b.updatedAt - a.updatedAt || b.createdAt - a.createdAt);
 
         const top = flat.slice(0, 15);
@@ -682,7 +675,7 @@
                 try {
                     const data = JSON.parse(el.dataset.recentDetail);
                     Modal.showDetail(data);
-                } catch (e) { /* ignore parse errors */ }
+                } catch (e) { }
             });
         });
     };
@@ -839,7 +832,6 @@
         }
     };
 
-    // ── DOM Observer Utility ──
     const settle = (ms = 200) => new Promise(r => setTimeout(r, ms));
 
     const waitForElement = (selector, timeout = 10000) => {
@@ -886,12 +878,10 @@
     };
 
     document.addEventListener("DOMContentLoaded", async function () {
-        // Extract NIS safely (no double query)
         const dropdowns = document.querySelectorAll('.nav-link.dropdown-toggle');
         const lastDropdown = dropdowns[dropdowns.length - 1];
         NIS = lastDropdown?.textContent.match(/\d+(\.\d+)?/g)?.[0] ?? '';
 
-        // Show buttons greyed out immediately, then enable after data loads
         try {
             await waitForElement('.table tbody');
             await settle();
@@ -916,7 +906,6 @@
                 const subjectName = subjectMeta?.subject_active?.name || getSubjectNameFromButton(button);
                 if (!subjectId) return;
 
-                // Start fetch immediately, wait for DOM in parallel
                 const detailPromise = fetchSubjectDetails(subjectId);
                 try {
                     const [, apiData] = await Promise.all([
@@ -931,7 +920,6 @@
             } else if (button.textContent.includes("Kembali")) {
                 removeSubjectAverageControls();
                 try {
-                    // Wait for detail table to be REMOVED first, then settle
                     await waitForElementGone('.table-uh');
                     await settle(300);
                     TableManager.addClickableLinks('.table tbody');
