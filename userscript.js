@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Luisa Score Helper
-// @namespace   https://github.com/luisa-score-helper
+// @namespace   https://github.com/soudblox/luisa-helper
 // @match       https://www.luisa.id/ulangan_harian
 // @version     1.0.0
 // @author      -
@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    // ── Centralized Styles ──
+    // styling popup etc
     GM_addStyle(`
         .luisa-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
